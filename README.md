@@ -11,8 +11,12 @@ Technically, this could be used as a generic two-class audio classifier, but the
 
 ### Example Output
 
-See https://youtu.be/DeTQBiKzmYc
+See https://youtu.be/DeTQBiKzmYc for a clip with the laugh track muted using this tool.
 
 ### Details
 
 Load the Jupyter notebook for code and explanation.
+
+### Requirements
+
+Uses librosa, Keras, Tensorflow, scikit-learn, numpy, matplotlib, and more.  See the Jupyter notebook for details.
