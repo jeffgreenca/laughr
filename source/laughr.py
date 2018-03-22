@@ -260,5 +260,3 @@ if __name__ == '__main__':
         do_mute_laughs(sourceFile=args.mute_laughs[0],
                        outFile=args.mute_laughs[1],
                        model=localModel)
-# NOTE: Command to replace audio on video file:
-# ffmpeg -i S05E14.avi -i S05E14-method5a-output.wav -map 0:0 -map 1:0 -c:v copy -c:a aac -b:a 256k -shortest S05E14-method5a.mp4
