@@ -32,6 +32,7 @@ The `mutelaugh.ipynb` Jupyter notebook contains step-by-step explanations and vi
 To install, use `pipenv`:
 ```
 git clone https://github.com/jeffgreenca/laughr.git
+cd laughr
 cd source
 pipenv install
 ```
