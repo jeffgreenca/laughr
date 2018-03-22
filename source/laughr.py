@@ -6,9 +6,12 @@ import math
 from glob import glob
 import argparse
 import os
-
+# NOTE: keras is imported later when needed, to improve responsiveness
+# For example, if invalid arguments are passed, the program executes faster.
 
 class RawClip3(object):
+    """Loads audio clips from disk, applies a rolling window, and
+    extracts features from each sample."""
     featureFuncs = ['tonnetz', 'spectral_rolloff', 'spectral_contrast',
                     'spectral_bandwidth', 'spectral_flatness', 'mfcc',
                     'chroma_cqt', 'chroma_cens', 'melspectrogram']
@@ -85,6 +88,8 @@ class RawClip3(object):
 
 
 class DataSet(object):
+    """Loads many audio clips, the labelled examples.  Also provides
+    help for splitting into 60/20/20 train, cv, test"""
     def __init__(self, datapath, laughPrefix='/ff*.wav', dialogPrefix='/dd*.wav'):
         self.clips = []
         for y_class, files in [[1., 0.], glob(datapath + laughPrefix)], [[0., 1.], glob(datapath + dialogPrefix)]:
@@ -119,6 +124,7 @@ class DataSet(object):
 
 
 class LaughRemover(object):
+    """Contains the logic to apply predictions as audio transformations"""
     def __init__(self, kerasModel=None, kerasModelFile=None):
         import keras
         assert kerasModel or kerasModelFile
