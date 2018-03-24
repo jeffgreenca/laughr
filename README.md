@@ -7,6 +7,12 @@ Jeff Green, 2018
 
 A tool to mute laugh tracks from an audio clip without operator intervention.  Implements a recurrent neural network (LSTM network) to classify audio.
 
+### Example Output
+
+See https://youtu.be/DeTQBiKzmYc for a clip with the laugh track muted using this tool.
+
+### Description
+
 I made this specifically for muting the audience laugh track from the TV show Frasier.
 
 Because the show's "laugh track" is not pre-canned laugher, but instead recorded from the live studio, it varies significantly between instances.  As a result, while the "laugh" audio can certainly be classified, it requires more than a simple matching algorithm to classify correctly.
@@ -14,10 +20,6 @@ Because the show's "laugh track" is not pre-canned laugher, but instead recorded
 I use the `librosa` library for feature extraction from the audio, create samples using a rolling window, and then apply a 3-layer LSTM network to classify each sample.
 
 Technically, this could be used as a generic two-class audio classifier, but the model is not validated against anything besides laugh audio classification.
-
-### Example Output
-
-See https://youtu.be/DeTQBiKzmYc for a clip with the laugh track muted using this tool.
 
 ### Index
 
