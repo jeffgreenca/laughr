@@ -157,23 +157,21 @@ class LaughRemover(object):
 
 def do_train(nonLaughFiles, laughFiles, modelOutFilename):
     from keras.models import Sequential
-    from keras.layers import Dense, LSTM, Dropout, BatchNormalization
+    from keras.layers import Dense, LSTM
     ds = DataSet('', laughPrefix=laughFiles, dialogPrefix=nonLaughFiles)
 
     input_shape = ds.X[0].shape
 
     model = Sequential()
-    model.add(BatchNormalization(input_shape=input_shape))
-    model.add(LSTM(64, return_sequences=True))
-    model.add(LSTM(64, return_sequences=True))
-    model.add(LSTM(64))
-    model.add(Dropout(0.2))
+    model.add(LSTM(24, input_shape=input_shape, recurrent_dropout=0.2, return_sequences=True))
+    model.add(LSTM(16, recurrent_dropout=0.2, return_sequences=True))
+    model.add(LSTM(8, recurrent_dropout=0.2))
     model.add(Dense(2, activation='softmax'))
     model.compile(optimizer='rmsprop',
                   loss='categorical_crossentropy', metrics=['accuracy'])
 
     model.fit(ds.X[ds.idx_train], ds.Y_class[ds.idx_train],
-              epochs=4, batch_size=16, verbose=2)
+              epochs=15, batch_size=1000, verbose=2)
 
     model.evaluate(ds.X[ds.idx_cv], ds.Y_class[ds.idx_cv])
     model.evaluate(ds.X[ds.idx_test], ds.Y_class[ds.idx_test])
