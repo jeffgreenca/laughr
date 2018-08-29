@@ -25,7 +25,7 @@ Technically, this could be used as a generic two-class audio classifier, but the
 
 `./assets/` contains a model trained on my labelled examples.  I used this model to create the example output video above.
 
-`./source/` contains the tool, which can be run at the command line.  I also added a helper script for Windows that wraps the necessary ffmpeg calls for splitting and combining video and audio tracks.
+`./src/` contains the tool, which can be run at the command line.  I also added a helper script for Windows that wraps the necessary ffmpeg calls for splitting and combining video and audio tracks.
 
 The `mutelaugh.ipynb` Jupyter notebook contains step-by-step explanations and visualizations to help understand how the tool works.
 
@@ -35,7 +35,7 @@ To install, use `pipenv`:
 ```
 git clone https://github.com/jeffgreenca/laughr.git
 cd laughr
-cd source
+cd src
 pipenv install
 ```
 
