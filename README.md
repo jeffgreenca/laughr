@@ -7,6 +7,8 @@ Jeff Green, 2018
 
 A tool to mute laugh tracks from an audio clip without operator intervention.  Implements a recurrent neural network (LSTM network) to classify audio.
 
+[Laughr Presentation](../master/laughr-presentation.pdf) - Slide deck from my live presentation at [Sacramento Artificial Intelligence Meetup](https://www.meetup.com/Sacramento-Artificial-Intelligence-Meetup/events/kwnnspyxlbbc/)
+
 ### Example Output
 
 See https://youtu.be/DeTQBiKzmYc for a clip with the laugh track muted using this tool.
