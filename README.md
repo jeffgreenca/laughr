@@ -27,6 +27,8 @@ Technically, this could be used as a generic two-class audio classifier, but the
 
 `./src/` contains the tool, which can be run at the command line.  I also added a helper script for Windows that wraps the necessary ffmpeg calls for splitting and combining video and audio tracks.
 
+`./src/benchmark.py` is a mess of code that I used to train and evaluate competing model variants.  It may or may not work with the released `laughr.py` version.
+
 The `mutelaugh.ipynb` Jupyter notebook contains step-by-step explanations and visualizations to help understand how the tool works.
 
 ### Installing and Using
@@ -76,3 +78,7 @@ Commands:
                         saves the result in the output file.
 
 ```
+
+# License
+
+MIT license applies, except for `benchmark.py` which is released under CRAPL.
