@@ -97,6 +97,11 @@ class DataSet(object):
                 self.clips.append(RawClip3(ff, y_class))
         np.random.seed(seed=0)
         self.X, self.Y_class = self._get_samples()
+        # Note - splitting into train/test/cv here is a mistake.
+        # Because we already applied a rolling window, there is significant
+        # data duplicated across the train/test/cv set.
+        # A better approach, as per benchmark.py, is to use different DataSet
+        # instances for training and evaluating.
         self.idx_train, self.idx_cv, self.idx_test = self.split_examples_index(
             len(self.Y_class))
 
@@ -170,11 +175,12 @@ def do_train(nonLaughFiles, laughFiles, modelOutFilename):
     model.compile(optimizer='rmsprop',
                   loss='categorical_crossentropy', metrics=['accuracy'])
 
-    model.fit(ds.X[ds.idx_train], ds.Y_class[ds.idx_train],
+    model.fit(ds.X, ds.Y_class,
               epochs=15, batch_size=1000, verbose=2)
 
-    model.evaluate(ds.X[ds.idx_cv], ds.Y_class[ds.idx_cv])
-    model.evaluate(ds.X[ds.idx_test], ds.Y_class[ds.idx_test])
+    # See note in DataSet on why this is removed.
+    #model.evaluate(ds.X[ds.idx_cv], ds.Y_class[ds.idx_cv])
+    #model.evaluate(ds.X[ds.idx_test], ds.Y_class[ds.idx_test])
 
     model.save(modelOutFilename)
     return model
