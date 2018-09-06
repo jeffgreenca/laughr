@@ -6,6 +6,7 @@ import math
 from glob import glob
 import argparse
 import os
+import sys
 # NOTE: keras is imported later when needed, to improve responsiveness
 # For example, if invalid arguments are passed, the program executes faster.
 
@@ -90,11 +91,12 @@ class RawClip3(object):
 class DataSet(object):
     """Loads many audio clips, the labelled examples.  Also provides
     help for splitting into 60/20/20 train, cv, test"""
-    def __init__(self, datapath, laughPrefix='/ff*.wav', dialogPrefix='/dd*.wav'):
+    def __init__(self, laughPath, nonLaughPath):
         self.clips = []
-        for y_class, files in [[1., 0.], glob(datapath + laughPrefix)], [[0., 1.], glob(datapath + dialogPrefix)]:
-            for ff in files:
-                self.clips.append(RawClip3(ff, y_class))
+        for filename in os.listdir(laughPath):
+            self.clips.append(RawClip3(os.path.join(laughPath,filename), [1., 0.]))
+        for filename in os.listdir(nonLaughPath):
+            self.clips.append(RawClip3(os.path.join(nonLaughPath,filename), [0., 1.]))
         np.random.seed(seed=0)
         self.X, self.Y_class = self._get_samples()
         # Note - splitting into train/test/cv here is a mistake.
@@ -160,10 +162,10 @@ class LaughRemover(object):
         return samples * (frames ** exp)
 
 
-def do_train(nonLaughFiles, laughFiles, modelOutFilename):
+def do_train(nonLaughPath, laughPath, modelOutFilename):
     from keras.models import Sequential
     from keras.layers import Dense, LSTM
-    ds = DataSet('', laughPrefix=laughFiles, dialogPrefix=nonLaughFiles)
+    ds = DataSet(laughPath=laughPath, nonLaughPath=nonLaughPath)
 
     input_shape = ds.X[0].shape
 
@@ -225,12 +227,17 @@ if __name__ == '__main__':
     When training, the Keras model is saved to this file (overwrites!).
     When running only --mute-laughs, the model is loaded from this file.
     """
-    train_help = """
-    Train the model on the examples. Each glob should
-    specify a set of audio files containing laugher, and a
-    set containing non-laugher, respectively. You might
-    use a tool like Audacity to label and "Export Multiple"
-    to speed up creation of the training set.
+    train_laughs_help = """
+    Path to the directory with the set of '.wav' files containing laugher
+    for training. You might use a tool like Audacity to label and
+    "Export Multiple" to speed up creation of the training set with
+    laugh samples and not-laugh samples at once.
+    """
+    train_non_laughs_help = """
+    Path to the directory with the set of ''.wav' files containing non-laugher
+    for training. You might use a tool like Audacity to label and
+    "Export Multiple" to speed up creation of the training set with
+    laugh samples and not-laugh samples at once.
     """
     mute_help = """
     Identifies laugher in the source file, mutes it, and saves the
@@ -243,23 +250,34 @@ if __name__ == '__main__':
 
     group.add_argument('--model', required=True, type=str, metavar='MODEL.h5',
                        help=model_help)
-    group.add_argument('--train', type=str, nargs=2,
-                       metavar=('/path/to/L*.wav', '/path/to/D*.wav'),
-                       help=train_help)
+    group.add_argument('--train-laughs', type=str,
+                       metavar=('/path/to/laughs/files'),
+                       help=train_laughs_help)
+    group.add_argument('--train-non-laughs', type=str,
+                      metavar=('/path/to/non-laughs/files'),
+                      help=train_non_laughs_help)
     group.add_argument('--mute-laughs', type=str, nargs=2,
                        metavar=('SOURCE.wav', 'OUTPUT.wav'),
                        help=mute_help)
 
     args = parser.parse_args()
 
-    if not args.train and not args.mute_laughs:
+    if not args.train_laughs and not args.mute_laughs:
         print_model_summary(args.model)
         exit(0)
 
-    if args.train:
-        localModel = do_train(laughFiles=args.train[0],
-                              nonLaughFiles=args.train[1],
+    if args.train_laughs and args.train_non_laughs:
+        localModel = do_train(laughPath=args.train_laughs,
+                              nonLaughPath=args.train_non_laughs,
                               modelOutFilename=args.model)
+    elif args.train_laughs and not args.train_non_laughs:
+        sys.stderr.write('error: Missing path to not-laugh files. See --help for correct usage\n')
+        parser.print_help()
+        exit(0)
+    elif not args.train_laughs and args.train_non_laughs:
+        sys.stderr.write('error: Missing path to laugh files. See --help for correct usage\n')
+        parser.print_help()
+        exit(0)
 
     if args.mute_laughs:
         # The user can choose to train and mute, or just to mute.

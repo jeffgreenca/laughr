@@ -50,8 +50,8 @@ pipenv run python laughr.py --help
 
 Output:
 ```
-usage: laughr.py [-h] --model MODEL.h5
-                 [--train /path/to/L*.wav /path/to/D*.wav]
+usage: laughr.py [-h] --model MODEL.h5 [--train-laughs /path/to/laughs/files]
+                 [--train-non-laughs /path/to/non-laughs/files]
                  [--mute-laughs SOURCE.wav OUTPUT.wav]
 
 A tool to mute laugh tracks from an audio clip automatically. For example, to
@@ -69,12 +69,18 @@ Commands:
   --model MODEL.h5      When training, the Keras model is saved to this file
                         (overwrites!). When running only --mute-laughs, the
                         model is loaded from this file.
-  --train /path/to/L*.wav /path/to/D*.wav
-                        Train the model on the examples. Each glob should
-                        specify a set of audio files containing laugher, and a
-                        set containing non-laugher, respectively. You might
-                        use a tool like Audacity to label and "Export
-                        Multiple" to speed up creation of the training set.
+  --train-laughs /path/to/laughs/files
+                        Path to the directory with the set of '.wav' files
+                        containing laugher for training. You might use a tool
+                        like Audacity to label and "Export Multiple" to speed
+                        up creation of the training set with laugh samples and
+                        not-laugh samples at once.
+  --train-non-laughs /path/to/non-laughs/files
+                        Path to the directory with the set of ''.wav' files
+                        containing non-laugher for training. You might use a
+                        tool like Audacity to label and "Export Multiple" to
+                        speed up creation of the training set with laugh
+                        samples and not-laugh samples at once.
   --mute-laughs SOURCE.wav OUTPUT.wav
                         Identifies laugher in the source file, mutes it, and
                         saves the result in the output file.
