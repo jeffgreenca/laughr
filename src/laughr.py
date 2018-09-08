@@ -251,10 +251,10 @@ if __name__ == '__main__':
     group.add_argument('--model', required=True, type=str, metavar='MODEL.h5',
                        help=model_help)
     group.add_argument('--train-laughs', type=str,
-                       metavar=('/path/to/laughs/files'),
+                       metavar=('/path/to/laughs'),
                        help=train_laughs_help)
     group.add_argument('--train-non-laughs', type=str,
-                      metavar=('/path/to/non-laughs/files'),
+                      metavar=('/path/to/non-laughs'),
                       help=train_non_laughs_help)
     group.add_argument('--mute-laughs', type=str, nargs=2,
                        metavar=('SOURCE.wav', 'OUTPUT.wav'),

@@ -50,8 +50,8 @@ pipenv run python laughr.py --help
 
 Output:
 ```
-usage: laughr.py [-h] --model MODEL.h5 [--train-laughs /path/to/laughs/files]
-                 [--train-non-laughs /path/to/non-laughs/files]
+usage: laughr.py [-h] --model MODEL.h5 [--train-laughs /path/to/laughs]
+                 [--train-non-laughs /path/to/non-laughs]
                  [--mute-laughs SOURCE.wav OUTPUT.wav]
 
 A tool to mute laugh tracks from an audio clip automatically. For example, to
@@ -69,13 +69,13 @@ Commands:
   --model MODEL.h5      When training, the Keras model is saved to this file
                         (overwrites!). When running only --mute-laughs, the
                         model is loaded from this file.
-  --train-laughs /path/to/laughs/files
+  --train-laughs /path/to/laughs
                         Path to the directory with the set of '.wav' files
                         containing laugher for training. You might use a tool
                         like Audacity to label and "Export Multiple" to speed
                         up creation of the training set with laugh samples and
                         not-laugh samples at once.
-  --train-non-laughs /path/to/non-laughs/files
+  --train-non-laughs /path/to/non-laughs
                         Path to the directory with the set of ''.wav' files
                         containing non-laugher for training. You might use a
                         tool like Audacity to label and "Export Multiple" to
