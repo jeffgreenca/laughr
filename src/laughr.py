@@ -146,21 +146,32 @@ class LaughRemover(object):
         self._apply_laughs_array(rc.y, rc.sr, outfile, rc.laughs[:, 1])
         return rc
 
+    def collect_laughs(self, infile):
+        rc = RawClip3(infile)
+        rc.laughs = self.model.predict(rc.build_features())
+        indicator = self._convert_frames_to_sample_length(rc.laughs[:, 0], rc.y.T[0])
+        return rc, indicator
+
     def _apply_laughs_array(self, y, sr, outfile, laughs):
         y.T[0] = self._apply_frames_to_samples(frames=laughs, samples=y.T[0])
         y.T[1] = self._apply_frames_to_samples(frames=laughs, samples=y.T[1])
         sf.write(outfile, y, sr)
 
     def _apply_frames_to_samples(self, frames, samples, exp=1, period=15):
+        frames = self._convert_frames_to_sample_length(frames, samples, period)
+        # apply audio volume change
+        return samples * (frames ** exp)
+
+    def _convert_frames_to_sample_length(self, frames, samples, period=15):
         # Apply a rolling average to smooth the laugh/notlaugh sections
         frames = np.convolve(frames, np.ones((period,)) / period, mode='same')
         # Each frame = default 512 samples, so expand over that period
         frames = np.repeat(frames, librosa.core.frames_to_samples(1))
         # Trim excess padding off the rightmost end
         frames = frames[:len(samples)]
-        # Finally, apply audio volume change
-        return samples * (frames ** exp)
-
+        # Finally, return "frames" which is now a classifier array
+        # of same length as samples
+        return frames
 
 def do_train(nonLaughPath, laughPath, modelOutFilename):
     from keras.models import Sequential
