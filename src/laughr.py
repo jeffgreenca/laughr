@@ -141,10 +141,24 @@ class LaughRemover(object):
             self.model = keras.models.load_model(filepath=kerasModelFile)
 
     def remove_laughs(self, infile, outfile):
+        """Remove laughs from a single sound file"""
         rc = RawClip3(infile)
         rc.laughs = self.model.predict(rc.build_features())
         self._apply_laughs_array(rc.y, rc.sr, outfile, rc.laughs[:, 1])
         return rc
+
+    def batch_remove_laughs(self, indir : str, outdir: str, batch_size: int=32):
+        """Remove laughs from all files in a directory"""
+        # If indir == outdir, processes files in-place 
+        batch_of_features = []
+        for filename in os.listdir(indir):
+            rc = RawClip3(os.path.join(indir, filename))
+            features = rc.build_features()
+            # Need to add some form of padding to each file so that it can be batched for keras.
+            # Then need to unpad so that original file duration is restored.
+            # Right now, it just loads the model once, and runs all the files through it one-by-one. 
+            rc.laughs = self.model.predict(features)
+            self._apply_laughs_array(rc.y, rc.sr, os.path.join(outdir, filename), rc.laughs[:, 1])
 
     def _apply_laughs_array(self, y, sr, outfile, laughs):
         y.T[0] = self._apply_frames_to_samples(frames=laughs, samples=y.T[0])
@@ -199,6 +213,17 @@ def do_mute_laughs(sourceFile, outFile, model):
 
     laughr.remove_laughs(sourceFile, outFile)
 
+def do_batch_mute_laughs(inputDir, outputDir, model):
+    params = {}
+    if type(model) == str:
+        params['kerasModelFile'] = model
+    else:
+        params['kerasModel'] = model
+
+    laughr = LaughRemover(**params)
+
+    laughr.batch_remove_laughs(inputDir, outputDir)
+
 
 def print_model_summary(model):
     if not os.path.isfile(model):
@@ -243,6 +268,11 @@ if __name__ == '__main__':
     Identifies laugher in the source file, mutes it, and saves the
     result in the output file.
     """
+    mute_batch_help = """
+    Identifies laugher in the all source files in specified directory, mutes them, and saves the
+    results in the output directory.
+    Giving the same directory path for input and output will replace the files in input directory.
+    """
 
     # Build the user interface
     parser = argparse.ArgumentParser(description=prog_desc)
@@ -259,10 +289,13 @@ if __name__ == '__main__':
     group.add_argument('--mute-laughs', type=str, nargs=2,
                        metavar=('SOURCE.wav', 'OUTPUT.wav'),
                        help=mute_help)
+    group.add_argument('--mute-laughs-batch', type=str, nargs=2,
+                       metavar=('/path/to/input_dir', '/path/to/output_dir'),
+                       help=mute_batch_help)
 
     args = parser.parse_args()
 
-    if not args.train_laughs and not args.mute_laughs:
+    if not args.train_laughs and not args.mute_laughs and not args.mute_laughs_batch:
         print_model_summary(args.model)
         exit(0)
 
@@ -287,4 +320,15 @@ if __name__ == '__main__':
             localModel = args.model
         do_mute_laughs(sourceFile=args.mute_laughs[0],
                        outFile=args.mute_laughs[1],
+                       model=localModel)
+    elif args.mute_laughs_batch:
+        inputDir=args.mute_laughs_batch[0]
+        outputDir=args.mute_laughs_batch[1]
+        if not (os.path.isdir(inputDir) or os.path.isdir(outputDir)):
+            print("Can't find the directory. Please check the path specified.")
+            exit(0)
+        if 'localModel' not in vars():
+            localModel = args.model
+        do_batch_mute_laughs(inputDir=inputDir,
+                       outputDir=outputDir,
                        model=localModel)
