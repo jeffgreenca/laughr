@@ -84,7 +84,11 @@ Commands:
   --mute-laughs SOURCE.wav OUTPUT.wav
                         Identifies laugher in the source file, mutes it, and
                         saves the result in the output file.
-
+  --mute-laughs-batch /path/to/input_dir /path/to/output_dir
+                        Identifies laugher in the all source files in specified  
+                        directory, mutes them, and saves the results in the  
+                        output directory. Giving the same directory path for
+                        input and output will replace the files in input directory.
 ```
 
 # License
